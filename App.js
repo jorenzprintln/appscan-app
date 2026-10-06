@@ -5,7 +5,8 @@ import {
 } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import DocumentScanner from 'react-native-document-scanner-plugin';
-
+import { File } from 'expo-file-system';
+import * as ImagePicker from 'expo-image-picker';
 const API_URL = 'http://192.168.1.36/appscan';
 
 export default function App() {
@@ -43,6 +44,18 @@ export default function App() {
       Alert.alert('Scan failed', String(e.message || e));
     }
   }
+  async function takePhoto() {
+    try {
+      const perm = await ImagePicker.requestCameraPermissionsAsync();
+      if (!perm.granted) return Alert.alert('Camera permission is required');
+      const result = await ImagePicker.launchCameraAsync({ quality: 0.8 });
+      if (!result.canceled && result.assets?.length) {
+        setPages((prev) => [...prev, result.assets[0].uri]);
+      }
+    } catch (e) {
+      Alert.alert('Camera failed', String(e.message || e));
+    }
+  }
 
   function removePage(i) {
     setPages((prev) => prev.filter((_, idx) => idx !== i));
@@ -53,14 +66,10 @@ export default function App() {
     if (!pages.length) return Alert.alert('Scan at least one page');
 
     const form = new FormData();
-    form.append('user_id', String(user.id));
-    form.append('folder_name', folderName.trim());
-    pages.forEach((uri, i) => {
-      form.append('pages[]', {
-        uri,
-        name: `page_${i + 1}.jpg`,
-        type: 'image/jpeg',
-      });
+      form.append('user_id', String(user.id));
+      form.append('folder_name', folderName.trim());
+      pages.forEach((uri) => {
+        form.append('pages[]', new File(uri));
     });
 
     setLoading(true);
@@ -123,6 +132,9 @@ export default function App() {
 
       <TouchableOpacity style={s.btn} onPress={scan} disabled={loading}>
         <Text style={s.btnText}>{pages.length ? '+ Scan more pages' : 'Start scanning'}</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={s.btnOutline} onPress={takePhoto} disabled={loading}>
+        <Text style={s.btnOutlineText}>Take a photo instead</Text>
       </TouchableOpacity>
 
       <ScrollView contentContainerStyle={s.grid}>
