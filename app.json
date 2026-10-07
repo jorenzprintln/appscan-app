@@ -24,13 +24,20 @@
     "plugins": [
       "react-native-document-scanner-plugin",
       [
+        "expo-image-picker",
+        {
+          "cameraPermission": "AppScan needs camera access to photograph documents."
+        }
+      ],
+      [
         "expo-build-properties",
         {
           "android": {
             "usesCleartextTraffic": true
           }
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "extra": {
       "eas": {

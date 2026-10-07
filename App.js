@@ -7,7 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import DocumentScanner from 'react-native-document-scanner-plugin';
 import { File } from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
-const API_URL = 'http://192.168.1.36/appscan';
+const API_URL = 'http://192.168.1.40/appscan';
 
 export default function App() {
   const [users, setUsers] = useState([]);
